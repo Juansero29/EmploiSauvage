@@ -1,4 +1,4 @@
-﻿// Copyright 2010-2021 Google LLC
+﻿// Copyright 2010-2022 Google LLC
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -28,32 +28,24 @@ public class ShiftSchedulingSat
 
     static void SolveShiftScheduling()
     {
-        // 0 => X
-        // 1 => Y
-        // 2 => Z
         int numEmployees = 3;
-        int numWeeks = 4;
-
-        // M => Matin/Midi (Ouverture - 14h30) 4h-4h30
-        // A => Aprèm (14h - 17h30) 3h30
-        // S => Soir (17h - Fermeture) 1h15 - 4h45
-        // R => Repos Toute la journée
-
-        var shifts = new[] { "R", "M", "A", "S" };
+        int numWeeks = 3;
+        var shifts = new[] { "O", "M", "A", "N" };
 
         // Fixed assignment: (employee, shift, day).
         // This fixes the first 2 days of the schedule.
         var fixedAssignments = new (int Employee, int Shift, int Day)[] {
-            (0, 1, 0), (1, 2, 0), (2, 3, 0),
-            (0, 3, 1), (1, 2, 1), (2, 1, 1),
+            (0, 0, 0), (1, 0, 0), (2, 1, 0),
+            (0, 1, 1), (1, 1, 1), (2, 2, 1)
         };
 
         // Request: (employee, shift, day, weight)
-        // A negative weight indicates that the employee desires this assignment.
+        // A negative weight indicates that the employee desire this assignment.
         var requests = new (int Employee, int Shift, int Day,
-                           int Weight)[] {
-                                 // Employee 5 wants a night shift on the second Thursday.
-                                    (1, 3, 10, -2),
+                           int Weight)[] {// Employee 2 wants the first Saturday off.
+                                          (2, 0, 5, -2),
+                                          // Employee 1 does not want a night shift on the first Friday.
+                                          (1, 3, 4, 4)
         };
 
         // Shift constraints on continuous sequence :
@@ -61,8 +53,8 @@ public class ShiftSchedulingSat
         // soft_max, hard_max, max_penalty)
         var shiftConstraints =
             new (int Shift, int HardMin, int SoftMin, int MinPenalty, int SoftMax, int HardMax, int MaxPenalty)[] {
-                // One or two consecutive days of rest, this is a hard constraint. 1 is possible but penalized.
-                (0, 1, 1, 20, 2, 2, 0),
+                // One or two consecutive days of rest, this is a hard constraint.
+                (0, 1, 1, 0, 2, 2, 0),
                 // Between 2 and 3 consecutive days of night shifts, 1 and 4 are
                 // possible but penalized.
                 (3, 1, 2, 20, 3, 4, 5),
@@ -266,7 +258,7 @@ public class ShiftSchedulingSat
             var header = "          ";
             for (int w = 0; w < numWeeks; w++)
             {
-                header += "L M M J V S D ";
+                header += "M T W T F S S ";
             }
 
             Console.WriteLine(header);
