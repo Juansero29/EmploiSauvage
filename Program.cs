@@ -39,7 +39,7 @@ public class ShiftSchedulingSat
         // S => Soir (17h - Fermeture) 1h15 - 4h45
         // R => Repos Toute la journée
 
-        var shifts = new[] { "R", "M", "A","S" };
+        var shifts = new[] { "R", "M", "A", "S" };
 
         // Fixed assignment: (employee, shift, day).
         // This fixes the first 2 days of the schedule.
@@ -52,12 +52,8 @@ public class ShiftSchedulingSat
         // A negative weight indicates that the employee desires this assignment.
         var requests = new (int Employee, int Shift, int Day,
                            int Weight)[] {
-                               // Employee 0 wants the first Saturday off.
-                                 //         (0, 0, 5, -2),
-                                 //// Employee 5 wants a night shift on the second Thursday.
-                                 //   (5, 3, 10, -2),
-                                 //         // Employee 2 does not want a night shift on the first Friday.
-                                 //         (2, 3, 4, 4)
+                                 // Employee 5 wants a night shift on the second Thursday.
+                                    (1, 3, 10, -2),
         };
 
         // Shift constraints on continuous sequence :
