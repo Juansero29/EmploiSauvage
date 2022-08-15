@@ -41,15 +41,15 @@ Total par semaine : 66.75h
 
 ## Shifts Possibles
 
-1. M => Matin/Midi (Ouverture - 14h30) 4h-4h30
-   A => Aprèm (14h - 17h30) 3h30
-   S => Soir (17h - Fermeture) 1h15 - 4h45
-   R => Repos Toute la journée
+``M => Matin/Midi (Ouverture - 14h30) 4h-4h30
+ A => Aprèm (14h - 17h30) 3h30
+ S => Soir (17h - Fermeture) 1h15 - 4h45
+ R => Repos Toute la journée``
 
-2. M => Matin/Midi (Ouverture - 13h)
-   A => Aprèm (12h30 - 17h30) 3h30
-   S => Soir (17h - Fermeture) 1h15 - 4h45
-   R => Repos Toute la journée
+``M => Matin/Midi (Ouverture - 13h)
+ A => Aprèm (12h30 - 17h30) 3h30
+ S => Soir (17h - Fermeture) 1h15 - 4h45
+ R => Repos Toute la journée``
 
 ## Liens interessants de programmation par contraintes
 
@@ -57,6 +57,7 @@ Total par semaine : 66.75h
 - <https://developers.google.com/optimization/cp>
 - <https://github.com/google/or-tools/blob/master/examples/dotnet/ShiftSchedulingSat.cs>
 - <https://developers.google.com/optimization/scheduling/employee_scheduling>
+- <https://www.optaplanner.org/learn/useCases/employeeRostering.html>
 
 ## Autres questions à explorer
 
