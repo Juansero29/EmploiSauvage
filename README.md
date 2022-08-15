@@ -8,7 +8,7 @@ Le but est d'avoir la/les semaine(s) type d'emploi du temps en respectant le max
 
 - Il ya a au total 3 employés: X, Y, Z
 - Tout le monde, mais surtout X, a deux jours de repos consécutifs par semaine
-- Un employé ne doit pas faire plus de deux nocturnes d'affilé
+- Un employé ne doit pas faire plus de deux nocturnes (travail après 18h) d'affilé
 - X travaille 35 heures par semaine
 - X et Y travaillent maximum 7h par jour
 - X et Y travaillent minimum 5h s'ils se déplacent au travail
@@ -50,10 +50,6 @@ Total par semaine : 66.75h
    A => Aprèm (12h30 - 17h30) 3h30
    S => Soir (17h - Fermeture) 1h15 - 4h45
    R => Repos Toute la journée
-
-## Glossaire
-
-- Nocturne : travail après 18h
 
 ## Liens interessants de programmation par contraintes
 
