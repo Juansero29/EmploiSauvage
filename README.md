@@ -41,15 +41,20 @@ Total par semaine : 66.75h
 
 ## Shifts Possibles
 
-``M => Matin/Midi (Ouverture - 14h30) 4h-4h30
+```text
+ M => Matin/Midi (Ouverture - 14h30) 4h-4h30
  A => Aprèm (14h - 17h30) 3h30
  S => Soir (17h - Fermeture) 1h15 - 4h45
- R => Repos Toute la journée``
+ R => Repos Toute la journée
+ ```
 
-``M => Matin/Midi (Ouverture - 13h)
- A => Aprèm (12h30 - 17h30) 3h30
- S => Soir (17h - Fermeture) 1h15 - 4h45
- R => Repos Toute la journée``
+
+```text
+M => Matin/Midi (Ouverture - 13h)
+A => Aprèm (12h30 - 17h30) 3h30
+S => Soir (17h - Fermeture) 1h15 - 4h45
+R => Repos Toute la journée
+```
 
 ## Liens interessants de programmation par contraintes
 
