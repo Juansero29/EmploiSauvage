@@ -1,4 +1,4 @@
-﻿// Copyright 2010-2022 Google LLC
+﻿// Copyright 2010-2021 Google LLC
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,6 +10,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+
+/// need to explain to model that :
+/// - each shift must only be done once each day
+/// - all shifts (except for day-offs) must be done exactly one time each day
+/// 
 
 using System;
 using System.Collections.Generic;
@@ -29,23 +35,18 @@ public class ShiftSchedulingSat
     static void SolveShiftScheduling()
     {
         int numEmployees = 3;
-        int numWeeks = 3;
-        var shifts = new[] { "O", "M", "A", "N" };
+        int numWeeks = 2;
+        var shifts = new[] { "R", "M", "A", "S" };
 
         // Fixed assignment: (employee, shift, day).
         // This fixes the first 2 days of the schedule.
         var fixedAssignments = new (int Employee, int Shift, int Day)[] {
-            (0, 0, 0), (1, 0, 0), (2, 1, 0),
-            (0, 1, 1), (1, 1, 1), (2, 2, 1)
         };
 
         // Request: (employee, shift, day, weight)
         // A negative weight indicates that the employee desire this assignment.
         var requests = new (int Employee, int Shift, int Day,
-                           int Weight)[] {// Employee 2 wants the first Saturday off.
-                                          (2, 0, 5, -2),
-                                          // Employee 1 does not want a night shift on the first Friday.
-                                          (1, 3, 4, 4)
+                           int Weight)[] {
         };
 
         // Shift constraints on continuous sequence :
@@ -54,7 +55,7 @@ public class ShiftSchedulingSat
         var shiftConstraints =
             new (int Shift, int HardMin, int SoftMin, int MinPenalty, int SoftMax, int HardMax, int MaxPenalty)[] {
                 // One or two consecutive days of rest, this is a hard constraint.
-                (0, 1, 1, 0, 2, 2, 0),
+                (0, 2, 2, 0, 2, 2, 0),
                 // Between 2 and 3 consecutive days of night shifts, 1 and 4 are
                 // possible but penalized.
                 (3, 1, 2, 20, 3, 4, 5),
@@ -66,7 +67,7 @@ public class ShiftSchedulingSat
         var weeklySumConstraints =
             new (int Shift, int HardMin, int SoftMin, int MinPenalty, int SoftMax, int HardMax, int MaxPenalty)[] {
                 // Constraints on rests per week.
-                (0, 1, 2, 7, 2, 3, 4),
+                (0, 2, 2, 7, 2, 2, 4),
                 // At least 1 night shift per week (penalized). At most 4 (hard).
                 (3, 0, 1, 3, 4, 4, 0),
             };
@@ -83,13 +84,13 @@ public class ShiftSchedulingSat
         // daily demands for work shifts (morning, afternon, night) for each day
         // of the week starting on Monday.
         var weeklyCoverDemands = new int[][] {
-            new[] { 2, 3, 1 }, // Monday
-            new[] { 2, 3, 1 }, // Tuesday
-            new[] { 2, 2, 2 }, // Wednesday
-            new[] { 2, 3, 1 }, // Thursday
-            new[] { 2, 2, 2 }, // Friday
-            new[] { 1, 2, 3 }, // Saturday
-            new[] { 1, 3, 1 }, // Sunday
+            Array.Empty<int>(), // Monday
+            Array.Empty<int>(), // Tuesday
+            Array.Empty<int>(), // Wednesday
+            Array.Empty<int>(), // Thursday
+            Array.Empty<int>(), // Friday
+            Array.Empty<int>(), // Saturday
+            Array.Empty<int>(), // Sunday
         };
 
         // Penalty for exceeding the cover constraint per shift type.
@@ -102,13 +103,13 @@ public class ShiftSchedulingSat
 
         BoolVar[,,] work = new BoolVar[numEmployees, numShifts, numDays];
 
-        foreach (int e in Range(numEmployees))
+        foreach (int employee in Range(numEmployees))
         {
-            foreach (int s in Range(numShifts))
+            foreach (int shift in Range(numShifts))
             {
-                foreach (int d in Range(numDays))
+                foreach (int dayNumber in Range(numDays))
                 {
-                    work[e, s, d] = model.NewBoolVar($"work{e}_{s}_{d}");
+                    work[employee, shift, dayNumber] = model.NewBoolVar($"work{employee}_{shift}_{dayNumber}");
                 }
             }
         }
@@ -117,17 +118,17 @@ public class ShiftSchedulingSat
         LinearExprBuilder obj = LinearExpr.NewBuilder();
 
         // Exactly one shift per day.
-        foreach (int e in Range(numEmployees))
+        foreach (int employee in Range(numEmployees))
         {
-            foreach (int d in Range(numDays))
+            foreach (int day in Range(numDays))
             {
-                var temp = new BoolVar[numShifts];
-                foreach (int s in Range(numShifts))
+                var tempShifts = new BoolVar[numShifts];
+                foreach (int tempShift in Range(numShifts))
                 {
-                    temp[s] = work[e, s, d];
+                    tempShifts[tempShift] = work[employee, tempShift, day];
                 }
 
-                model.Add(LinearExpr.Sum(temp) == 1);
+                model.Add(LinearExpr.Sum(tempShifts) == 1);
             }
         }
 
@@ -146,18 +147,18 @@ public class ShiftSchedulingSat
         // Shift constraints
         foreach (var constraint in shiftConstraints)
         {
-            foreach (int e in Range(numEmployees))
+            foreach (int employee in Range(numEmployees))
             {
-                var works = new BoolVar[numDays];
-                foreach (int d in Range(numDays))
+                var workDays = new BoolVar[numDays];
+                foreach (int day in Range(numDays))
                 {
-                    works[d] = work[e, constraint.Shift, d];
+                    workDays[day] = work[employee, constraint.Shift, day];
                 }
 
                 var (variables, coeffs) = AddSoftSequenceConstraint(
-                    model, works, constraint.HardMin, constraint.SoftMin, constraint.MinPenalty, constraint.SoftMax,
+                    model, workDays, constraint.HardMin, constraint.SoftMin, constraint.MinPenalty, constraint.SoftMax,
                     constraint.HardMax, constraint.MaxPenalty,
-                    $"shift_constraint(employee {e}, shift {constraint.Shift}");
+                    $"shift_constraint(employee {employee}, shift {constraint.Shift}");
 
                 obj.AddWeightedSum(variables, coeffs);
             }
@@ -213,27 +214,29 @@ public class ShiftSchedulingSat
         }
 
         // Cover constraints
-        foreach (int s in Range(1, numShifts))
+        foreach (int shift in Range(1, numShifts))
         {
-            foreach (int w in Range(numWeeks))
+            foreach (int week in Range(numWeeks))
             {
-                foreach (int d in Range(7))
+                foreach (int day in Range(7))
                 {
                     var works = new BoolVar[numEmployees];
-                    foreach (int e in Range(numEmployees))
+                    foreach (int employee in Range(numEmployees))
                     {
-                        works[e] = work[e, s, w * 7 + d];
+                        works[employee] = work[employee, shift, week * 7 + day];
                     }
 
                     // Ignore off shift
-                    var minDemand = weeklyCoverDemands[d][s - 1];
+                    var minDemand = weeklyCoverDemands[day].Count() > 0 ? weeklyCoverDemands[day][shift - 1] : 0;
+
+
                     var worked = model.NewIntVar(minDemand, numEmployees, "");
                     model.Add(LinearExpr.Sum(works) == worked);
 
-                    var overPenalty = excessCoverPenalties[s - 1];
+                    var overPenalty = excessCoverPenalties[shift - 1];
                     if (overPenalty > 0)
                     {
-                        var name = $"excess_demand(shift={s}, week={w}, day={d}";
+                        var name = $"excess_demand(shift={shift}, week={week}, day={day}";
                         var excess = model.NewIntVar(0, numEmployees - minDemand, name);
                         model.Add(excess == worked - minDemand);
                         obj.AddTerm(excess, overPenalty);
@@ -258,7 +261,7 @@ public class ShiftSchedulingSat
             var header = "          ";
             for (int w = 0; w < numWeeks; w++)
             {
-                header += "M T W T F S S ";
+                header += "L M M J V S D ";
             }
 
             Console.WriteLine(header);
