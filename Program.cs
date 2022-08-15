@@ -15,6 +15,7 @@
 /// need to explain to model that :
 /// - each shift must only be done once each day
 /// - all shifts (except for day-offs) must be done exactly one time each day
+/// - an employee can work more than one shift per day
 /// 
 
 using System;
@@ -34,8 +35,9 @@ public class ShiftSchedulingSat
 
     static void SolveShiftScheduling()
     {
-        int numEmployees = 3;
-        int numWeeks = 2;
+        
+        var numEmployees = 3;
+        var numWeeks = 2;
         var shifts = new[] { "R", "M", "A", "S" };
 
         // Fixed assignment: (employee, shift, day).
@@ -84,13 +86,13 @@ public class ShiftSchedulingSat
         // daily demands for work shifts (morning, afternon, night) for each day
         // of the week starting on Monday.
         var weeklyCoverDemands = new int[][] {
-            Array.Empty<int>(), // Monday
-            Array.Empty<int>(), // Tuesday
-            Array.Empty<int>(), // Wednesday
-            Array.Empty<int>(), // Thursday
-            Array.Empty<int>(), // Friday
-            Array.Empty<int>(), // Saturday
-            Array.Empty<int>(), // Sunday
+            new[] { 1, 1, 1}, // Monday
+            new[] { 1, 0, 0}, // Tuesday
+            new[] { 1, 0, 0}, // Wednesday
+            new[] { 1, 0, 0}, // Thursday
+            new[] { 1, 0, 0}, // Friday
+            new[] { 1, 0, 0}, // Saturday
+            new[] { 1, 0, 0}, // Sunday
         };
 
         // Penalty for exceeding the cover constraint per shift type.
@@ -128,7 +130,7 @@ public class ShiftSchedulingSat
                     tempShifts[tempShift] = work[employee, tempShift, day];
                 }
 
-                model.Add(LinearExpr.Sum(tempShifts) == 1);
+                model.Add(LinearExpr.Sum(tempShifts) <= 3);
             }
         }
 
