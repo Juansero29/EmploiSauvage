@@ -17,15 +17,10 @@ Le but est d'avoir la/les semaine(s) type d'emploi du temps en respectant le max
 
 ### Contraintes Variables
 
-- Z veut au possible faire maximum 8h par jour (à ~60%)
-- Y travaille entre 10h et 15h semaine (à ~80%)
-- Quand un employé travaille le weekend, il fait moins de nocturnes (à ~80%)
-- Si possible, augmenter le chevauchements entre employés (à ~60%)
+- Z veut au possible faire maximum 8h par jour
+- Y travaille entre 10h et 15h semaine
+- Quand un employé travaille le weekend, il fait moins de nocturnes
 
-### Autres Informations
-
-- Qu'est-ce qu'il se passe les jours fériés ? Ils travaillent comme d'habitude. Les horaires de chaque jours sont respectés.
-- Comment fonctionnent les jours de repos ? Ils ne sont pas pris en compte.
 
 ## Horaires d'ouverture de la boutique
 
@@ -56,6 +51,11 @@ S => Soir (17h - Fermeture) 1h15 - 4h45
 R => Repos Toute la journée
 ```
 
+### Autres Informations
+
+- Qu'est-ce qu'il se passe les jours fériés ? Ils travaillent comme d'habitude. Les horaires de chaque jours sont respectés.
+- Comment fonctionnent les jours de repos ? Ils ne sont pas pris en compte.
+
 ## Liens interessants de programmation par contraintes
 
 - <https://developers.google.com/optimization/introduction/overview>
@@ -69,3 +69,15 @@ R => Repos Toute la journée
 - La semaine type (approche statique) est-elle vraiment la meilleure approche pour établir l'emploi du temps des salariés ?
   - À analyser pours/contres face à un système dynamique ? Système dynamique = un système temps réel, qui tient compte des jours feriés, congés, maladies, fuseaux horaires, etc. mais qui changerait constamments)
   - Possiblité de pondre les deux (statique et dynamique) via les algorithmes de contraintes ?
+
+## Installation de libraries Python Optimisation
+
+Un solveur d'optimisation linéaire mixte est sûrement nécessaire pour accomplir cette opti
+
+- [Google OR Tools](https://developers.google.com/optimization/install)
+  - `python -m pip install --upgrade --user ortools`
+- [PuLP](https://pypi.org/project/PuLP/)
+  - `pip install pulp`
+- [gurobipy](https://support.gurobi.com/hc/en-us/articles/360044290292-How-do-I-install-Gurobi-for-Python)
+  - `python -m pip install gurobipy`
+- [cplex](https://pypi.org/project/cplex/)
